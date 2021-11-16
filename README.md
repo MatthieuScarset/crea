@@ -2,6 +2,7 @@
 
 A community-driven marketplace for creators.
 
+
 ## Goals
 
 **Create a _shared media bank_**
@@ -14,13 +15,20 @@ authors.
 
 **Create an easy-to-use _marketplace_**
 
-Allow customers to quickly create tailor-made request for proposals, thanks to a
-flexible _contract_ form.
+Allow clients to quickly create tailor-made request for work.
 
-Enable creators to answer projects and to submit their work privately.
+Requests and specifications will be immutable, hosted on IPFS network.
 
-Guarantee payment of work at all time in the project, thanks to deposits on-chain.
+Creators can answer projects and submit their work privately.
+
+Payment guarantee is total at all times of the project, thanks to the smart 
+contract's term - especially with on-chain deposits from both parties.
 
 **Create a _Universal pricing_**
 
 Allow creators to fix rates for all kinds of creative works through a governance system.
+
+The provider knows how much its work is worth, not the client.
+
+It will fix the current situation where creators are competing against their peers
+in a worldwide and unfair market - where prices are lowered continuously.

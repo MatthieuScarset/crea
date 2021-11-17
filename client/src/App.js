@@ -5,7 +5,7 @@ import UniversalPricing from "./contracts/UniversalPricing.json";
 import getWeb3 from "./getWeb3";
 
 class App extends Component {
-  state = { owner: null, web3: null, accounts: null, contract: null };
+  state = { pricings: [], web3: null, accounts: null, contract: null };
 
   isLocalhost = Boolean(
     window.location.hostname === "localhost" ||
@@ -35,7 +35,7 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance }, this.runExample);
+      this.setState({ web3, accounts, contract: instance }, this.getPricings);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -45,13 +45,24 @@ class App extends Component {
     }
   };
 
-  runExample = async () => {
-    const { accounts, contract } = this.state;
+  getPricings = async (start = 0, end = 10) => {
+    const { account, contract } = this.state;
 
-    const response = await contract.methods.owner().call({ from: accounts[0] });
+    const list = [];
+    let i = start;
+    do {
+      try {
+        let price = await contract.methods.pricings(i).call();
+        console.log(i, price);
+        i++;
+      } catch (error) {
+        // Fail silently.
+        break;
+      }
+    } while (i <= end);
 
     // Update state with the result.
-    this.setState({ owner: response });
+    this.setState({ pricings: list });
   };
 
   render() {
@@ -59,8 +70,8 @@ class App extends Component {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
     return (
-      <div className="App h-screen">
-        <header className="">
+      <div className="App w-full md:w-1/3 m-auto flex flex-col space-y-10 md:space-y-8">
+        <header>
           <img
             className="m-auto max-h-40"
             src="logo.svg"
@@ -70,8 +81,10 @@ class App extends Component {
         </header>
 
         <main>
-          <h2 className="font-extrabold">Existing pricings</h2>
-          <Pricings items={this.state.pricings} />
+          <div className="bg-gray-100 rounded-xl p-8">
+            <h2 className="text-xl font-extrabold">Existing pricings</h2>
+            <Pricings items={this.state.pricings} />
+          </div>
         </main>
       </div>
     );

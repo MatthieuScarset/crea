@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import "./App.css";
+import Pricings from "./components/Pricings/Pricings";
 import UniversalPricing from "./contracts/UniversalPricing.json";
 import getWeb3 from "./getWeb3";
 
@@ -58,10 +59,10 @@ class App extends Component {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
     return (
-      <div className="App">
-        <header>
+      <div className="App h-screen">
+        <header className="">
           <img
-            className="App-logo"
+            className="m-auto max-h-40"
             src="logo.svg"
             alt="Logo of the CREA project"
           />
@@ -69,8 +70,8 @@ class App extends Component {
         </header>
 
         <main>
-          <h2>Smart Contract Example</h2>
-          <div>The stored value is: {this.state.owner}</div>
+          <h2 className="font-extrabold">Existing pricings</h2>
+          <Pricings items={this.state.pricings} />
         </main>
       </div>
     );

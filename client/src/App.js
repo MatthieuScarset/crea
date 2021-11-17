@@ -70,7 +70,7 @@ class App extends Component {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
     return (
-      <div className="App w-full md:w-1/3 m-auto flex flex-col space-y-10 md:space-y-8">
+      <div className="w-full md:w-1/3 m-auto flex flex-col space-y-10 md:space-y-8">
         <header>
           <img
             className="m-auto max-h-40"
@@ -80,7 +80,11 @@ class App extends Component {
           <h1 className="visually-hidden">CREA</h1>
         </header>
 
-        <main>
+        <main className="flex flex-col space-y-10 md:space-y-8">
+          <div className="bg-gray-100 rounded-xl p-8">
+            <h2 className="text-xl font-extrabold">Add a new pricing</h2>
+          </div>
+
           <div className="bg-gray-100 rounded-xl p-8">
             <h2 className="text-xl font-extrabold">Existing pricings</h2>
             <Pricings items={this.state.pricings} />

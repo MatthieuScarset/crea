@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import React from "react";
-import "./Pricings.css";
 
 const Pricings = (props) => (
   <ul className="list-none" data-testid="Pricings">
@@ -18,6 +17,8 @@ Pricings.propTypes = {
   items: PropTypes.array.isRequired,
 };
 
-Pricings.defaultProps = {};
+Pricings.defaultProps = {
+  items: [],
+};
 
 export default Pricings;

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./App.css";
+import PricingForm from "./components/PricingForm/PricingForm";
 import Pricings from "./components/Pricings/Pricings";
 import UniversalPricing from "./contracts/UniversalPricing.json";
 import getWeb3 from "./getWeb3";
@@ -77,12 +77,13 @@ class App extends Component {
             src="logo.svg"
             alt="Logo of the CREA project"
           />
-          <h1 className="visually-hidden">CREA</h1>
+          <h1 className="invisible">CREA</h1>
         </header>
 
         <main className="flex flex-col space-y-10 md:space-y-8">
           <div className="bg-gray-100 rounded-xl p-8">
             <h2 className="text-xl font-extrabold">Add a new pricing</h2>
+            <PricingForm />
           </div>
 
           <div className="bg-gray-100 rounded-xl p-8">

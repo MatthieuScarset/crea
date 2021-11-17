@@ -49,7 +49,7 @@ contract("UniversalPricing", (accounts) => {
   const creator = accounts[1];
   const attacker = accounts[9];
   const txAmount = web3.utils.fromWei("3", "ether");
-  const singlePrice = web3.utils.fromWei("1", "ether");
+  const singlePrice = 1;
 
   before("Setup contract", async () => {
     universalPricing = await UniversalPricing.new();
@@ -69,13 +69,26 @@ contract("UniversalPricing", (accounts) => {
   // Step 1
   describe("Step 1 - Add pricing", async () => {
     it("Should allow owner to add a pricing successfully", async () => {
-      assert.equal(
-        0,
-        await universalPricing.addPricing("Logo", singlePrice),
-        "The owner cannot add a new pricing"
-      );
+      const { logs } = await universalPricing.addPricing("Logo", 1);
+      const log = logs[0];
+      assert.equal(log.event, "NewPricing");
+      assert.equal(log.args.index.toString(), "0");
+
+      const pricing = await universalPricing.pricings(0);
+      assert.equal(pricing.price.toString(), "1");
     });
 
+    it("Should allow owner to add another pricing successfully", async () => {
+      const { logs } = await universalPricing.addPricing("Logo", 2);
+      const log = logs[0];
+      assert.equal(log.event, "NewPricing");
+      assert.equal(log.args.index.toString(), "1");
+
+      const pricing = await universalPricing.pricings(1);
+      assert.equal(pricing.price.toString(), "2");
+    });
+
+    /*
     it("Should prevent attacker from adding a pricing", async () => {
       assert.equal(
         false,
@@ -85,6 +98,7 @@ contract("UniversalPricing", (accounts) => {
         "An attacker is able to add a new pricing"
       );
     });
+    */
 
     // addCategory();
     // assignCategory();
@@ -92,6 +106,7 @@ contract("UniversalPricing", (accounts) => {
 
   // Step 2
   describe("Step 2 - Edit/Drop pricing", async () => {
+    /*
     it("Should allow anyone to edit a pricing", async () => {
       let index = 0;
       let newName = "Logo design";
@@ -105,7 +120,7 @@ contract("UniversalPricing", (accounts) => {
         "A creator cannot edit a pricing"
       );
     });
-
+    */
     // editCategory();
     // disablePricing();
   });

@@ -1,0 +1,25 @@
+{
+  "name": "crea",
+  "version": "1.0.0",
+  "description": "A community-driven marketplace for creators.",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MatthieuScarset/crea.eth.git"
+  },
+  "author": "Matthieu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MatthieuScarset/crea.eth/issues"
+  },
+  "homepage": "https://github.com/MatthieuScarset/crea.eth#readme",
+  "devDependencies": {
+    "@openzeppelin/contracts": "^4.3.3"
+  }
+}

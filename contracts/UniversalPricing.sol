@@ -7,21 +7,20 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 contract UniversalPricing is Ownable {
     struct Pricing {
         bool available;
-        bytes name;
+        string label;
         uint256 price;
     }
 
     Pricing[] public pricings;
 
-    event NewPricing(uint256 indexed index, Pricing price);
+    event NewPricing(uint256 indexed index);
 
-    function addPricing(string memory name, uint256 price) public onlyOwner {
-        require(bytes(name).length > 0, "Name cannot be empty.");
-        require(price >= 0, "Price must be greater than zero.");
+    function addPricing(string memory _label, uint256 _price) public onlyOwner {
+        require(bytes(_label).length > 0, "Label cannot be empty.");
+        require(_price >= 0, "Price must be greater than zero.");
 
-        pricings.push(Pricing(false, bytes(name), price));
+        pricings.push(Pricing(false, _label, _price));
 
-        uint256 i = pricings.length - 1;
-        emit NewPricing(pricings.length - 1, pricings[i]);
+        emit NewPricing(pricings.length - 1);
     }
 }

@@ -76,6 +76,8 @@ contract("UniversalPricing", (accounts) => {
 
       const pricing = await universalPricing.pricings(0);
       assert.equal(pricing.price.toString(), "1");
+      assert.equal(pricing.label, "Logo");
+      assert.equal(pricing.price.toString(), "1");
     });
 
     it("Should allow owner to add another pricing successfully", async () => {

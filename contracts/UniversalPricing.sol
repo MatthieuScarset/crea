@@ -11,11 +11,21 @@ contract UniversalPricing is Ownable {
         uint256 price;
     }
 
-    Pricing[] public pricings;
+    Pricing[] private pricings;
 
     event NewPricing(uint256 indexed index);
 
-    function addPricing(string memory _label, uint256 _price) public onlyOwner {
+    function getPricingsLength() public view returns (uint256) {
+        return pricings.length;
+    }
+
+    function getPricing(uint256 i) public view returns (Pricing memory) {
+        return pricings[i];
+    }
+
+    function addPricing(string memory _label, uint256 _price) public payable {
+        // @todo Ask for a deposit on this contract first.
+        // @todo Check user balance.
         require(bytes(_label).length > 0, "Label cannot be empty.");
         require(_price >= 0, "Price must be greater than zero.");
 

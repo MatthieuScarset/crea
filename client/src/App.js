@@ -5,7 +5,7 @@ import UniversalPricing from "./contracts/UniversalPricing.json";
 import getWeb3 from "./getWeb3";
 
 class App extends Component {
-  state = { pricings: [], web3: null, accounts: null, contract: null };
+  state = { web3: null, accounts: null, contract: null, pricings: [] };
 
   isLocalhost = Boolean(
     window.location.hostname === "localhost" ||
@@ -33,8 +33,7 @@ class App extends Component {
         deployedNetwork && deployedNetwork.address
       );
 
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
+      // Set web3, accounts, contract and Pricings to the state.
       this.setState({ web3, accounts, contract: instance }, this.getPricings);
     } catch (error) {
       // Catch any errors for any of the above operations.
@@ -45,21 +44,22 @@ class App extends Component {
     }
   };
 
-  getPricings = async (start = 0, end = 10) => {
-    const { account, contract } = this.state;
+  /**
+   * Load existing pricings.
+   */
+  getPricings = async () => {
+    let contract = this.state.contract;
 
-    const list = [];
-    let i = start;
-    do {
-      try {
-        let price = await contract.methods.pricings(i).call();
-        console.log(i, price);
-        i++;
-      } catch (error) {
-        // Fail silently.
-        break;
-      }
-    } while (i <= end);
+    let list = [];
+    let length = await contract.methods.getPricingsLength().call({
+      from: this.state.accounts[0],
+    });
+    for (let i = 0; i < length; i++) {
+      let price = await contract.methods.getPricing(i).call({
+        from: this.state.accounts[0],
+      });
+      list.push(price);
+    }
 
     // Update state with the result.
     this.setState({ pricings: list });
@@ -73,7 +73,7 @@ class App extends Component {
       <div className="w-full md:w-1/3 m-auto flex flex-col space-y-10 md:space-y-8">
         <header>
           <img
-            className="m-auto max-h-40"
+            className="m-auto pt-4 max-h-40"
             src="logo.svg"
             alt="Logo of the CREA project"
           />
@@ -83,7 +83,11 @@ class App extends Component {
         <main className="flex flex-col space-y-10 md:space-y-8">
           <div className="bg-gray-100 rounded-xl p-8">
             <h2 className="text-xl font-extrabold">Add a new pricing</h2>
-            <PricingForm />
+            <PricingForm
+              web3={this.state.web3}
+              contract={this.state.contract}
+              account={this.state.accounts[0]}
+            />
           </div>
 
           <div className="bg-gray-100 rounded-xl p-8">

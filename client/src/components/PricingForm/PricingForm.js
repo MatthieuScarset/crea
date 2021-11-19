@@ -4,6 +4,9 @@ import React from "react";
 class PricingForm extends React.Component {
   constructor(props) {
     super(props);
+    this.web3 = props.web3;
+    this.contract = props.contract;
+    this.account = props.account;
     this.state = { name: null, amount: null };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -15,10 +18,25 @@ class PricingForm extends React.Component {
     this.setState({ [key]: value });
   }
 
-  handleSubmit(event) {
-    console.log("A name was submitted: " + this.state.name);
-    console.log("A name was submitted: " + this.state.amount);
+  async handleSubmit(event) {
     event.preventDefault();
+    console.log(
+      "A new pricing was submitted with: " +
+        this.state.name +
+        " " +
+        this.state.amount
+    );
+
+    // @todo Send transaction
+    // const { logs } = await this.contract.methods.addPricing("Logo", 1);
+    const result = await this.contract.methods
+      .addPricing(this.state.name, this.state.amount)
+      .send({
+        from: this.account,
+        value: this.web3.utils.toWei("1", "ether"),
+      });
+
+    console.log(result);
   }
 
   render() {
@@ -35,6 +53,7 @@ class PricingForm extends React.Component {
             type="text"
             placeholder="Flyer design"
             onChange={this.handleChange}
+            required
           />
         </label>
         <label className="flex flex-col">
@@ -44,6 +63,7 @@ class PricingForm extends React.Component {
             type="number"
             placeholder="1 ETH"
             onChange={this.handleChange}
+            required
           />
         </label>
         <input
@@ -57,6 +77,9 @@ class PricingForm extends React.Component {
 }
 
 PricingForm.propTypes = {
+  web3: PropTypes.object.isRequired,
+  contract: PropTypes.object.isRequired,
+  account: PropTypes.string.isRequired,
   name: PropTypes.string,
   amount: PropTypes.number,
 };

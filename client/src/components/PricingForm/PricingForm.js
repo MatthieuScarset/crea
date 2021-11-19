@@ -34,6 +34,9 @@ class PricingForm extends React.Component {
         from: this.account,
         value: this.web3.utils.toWei("1", "ether"),
       });
+
+    // @todo remove this refresh and listen to tx.
+    window.location.reload();
   }
 
   render() {

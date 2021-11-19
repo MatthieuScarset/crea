@@ -2,15 +2,22 @@ import PropTypes from "prop-types";
 import React from "react";
 
 const Pricings = (props) => (
-  <ul className="list-none" data-testid="Pricings">
+  <ul className="mt-2 mb-2 list-none" data-testid="Pricings">
+    <li
+      key="legend"
+      className="flex flex-row justify-between items-center p-2 text-xl italic"
+    >
+      <span>Label</span>
+      <span>Price</span>
+    </li>
     {props.items.length > 0 ? (
       props.items.map(function (item, i) {
         console.log(item);
         return (
           <li
             key={i}
-            className="flex flex-row justify-between items-center p-4 text-xl italic hover:bg-blue-500 hover:text-white cursor-not-allowed"
-            title="You cannot edit a price yet. Still work in progress..."
+            className="flex flex-row justify-between items-center p-4 text-xl border-solid border-transparent border-2 border-gray-600 cursor-not-allowed  hover:text-gray-600"
+            title="Prices cannot be edited yet."
           >
             <span>{item.label}</span>
             <span>{item.price} ETH</span>

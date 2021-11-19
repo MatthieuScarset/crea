@@ -1,3 +1,4 @@
+import { create } from "ipfs-http-client";
 import React, { Component } from "react";
 import PricingForm from "./components/PricingForm/PricingForm";
 import Pricings from "./components/Pricings/Pricings";
@@ -5,17 +6,14 @@ import UniversalPricing from "./contracts/UniversalPricing.json";
 import getWeb3 from "./getWeb3";
 
 class App extends Component {
-  state = { web3: null, accounts: null, contract: null, pricings: [] };
-
-  isLocalhost = Boolean(
-    window.location.hostname === "localhost" ||
-      // [::1] is the IPv6 localhost address.
-      window.location.hostname === "[::1]" ||
-      // 127.0.0.1/8 is considered localhost for IPv4.
-      window.location.hostname.match(
-        /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
-      )
-  );
+  state = {
+    web3: null,
+    accounts: null,
+    contract: null,
+    ipfs: null,
+    pricings: [],
+    docHash: null,
+  };
 
   componentDidMount = async () => {
     try {
@@ -33,8 +31,23 @@ class App extends Component {
         deployedNetwork && deployedNetwork.address
       );
 
+      // Get web3 storage client.
+      const ipfs = await create("https://ipfs.infura.io:5001/api/v0");
+
       // Set web3, accounts, contract and Pricings to the state.
-      this.setState({ web3, accounts, contract: instance }, this.getPricings);
+      this.setState(
+        {
+          web3,
+          accounts,
+          contract: instance,
+          ipfs: ipfs,
+          pricings: [],
+          docHash: "",
+        },
+        this.getContractValues
+      );
+
+      this.publishToIpfs = this.publishToIpfs.bind(this);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -42,6 +55,14 @@ class App extends Component {
       );
       console.error(error);
     }
+  };
+
+  /**
+   * Set state callback function.
+   */
+  getContractValues = async () => {
+    this.getPricings();
+    this.getDocHash();
   };
 
   /**
@@ -67,10 +88,55 @@ class App extends Component {
     this.setState({ pricings: list });
   };
 
+  /**
+   * Load document hash.
+   *
+   * @todo Refresh hash when user publish to IPFS again.
+   */
+  getDocHash = async () => {
+    let contract = this.state.contract;
+    let _hash = await contract.methods.getDocument().call({
+      from: this.state.accounts[0],
+    });
+
+    this.setState({ docHash: _hash });
+  };
+
+  /**
+   * Generate new pricing sheet and publish it to IPFS.
+   *
+   * Feeds the contract back.
+   *
+   * @todo Filter pricings items by status "available" or not.
+   */
+  publishToIpfs = async () => {
+    const blob = new Blob([JSON.stringify(this.state.pricings)], {
+      type: "application/json",
+    });
+
+    const file = new File([blob], "universal_pricing_sheet.json");
+
+    const added = await this.state.ipfs.add(file);
+
+    const url = "https://ipfs.infura.io/ipfs/" + added.path;
+    console.log(url);
+
+    await this.state.contract.methods.setDocument(url).send({
+      from: this.state.accounts[0],
+      value: this.state.web3.utils.toWei("1", "ether"),
+    });
+
+    // @todo remove this refresh and listen to tx.
+    window.location.reload();
+  };
+
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
+
+    console.log(this.state.docHash.length);
+
     return (
       <div className="w-full md:w-1/3 m-auto flex flex-col space-y-10 md:space-y-8">
         <header>
@@ -84,6 +150,34 @@ class App extends Component {
 
         <main className="flex flex-col space-y-10 md:space-y-8">
           <div className="bg-gray-100 rounded-xl p-8">
+            <h2 className="text-xl font-extrabold">Universal pricings</h2>
+
+            <div className="flex flex-col space-y-0.5">
+              {this.state.docHash.length == 0 ? (
+                ""
+              ) : (
+                <a
+                  title="Latest version of the Universal pricing sheet"
+                  target="_blank"
+                  href={this.state.docHash}
+                  className="block text-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
+                >
+                  See latest version
+                </a>
+              )}
+
+              <a
+                onClick={this.publishToIpfs}
+                className="block text-center bg-green-600 text-white hover:bg-green-800 font-bold py-2 px-4 rounded cursor-pointer"
+              >
+                Publish new version to IPFS
+              </a>
+            </div>
+
+            <Pricings items={this.state.pricings} />
+          </div>
+
+          <div className="bg-gray-100 rounded-xl p-8">
             <h2 className="text-xl font-extrabold">Add a new pricing</h2>
             <PricingForm
               web3={this.state.web3}
@@ -93,8 +187,10 @@ class App extends Component {
           </div>
 
           <div className="bg-gray-100 rounded-xl p-8">
-            <h2 className="text-xl font-extrabold">Existing pricings</h2>
-            <Pricings items={this.state.pricings} />
+            <div className="flex flex-row justify-between">
+              <h2 className="text-xl font-extrabold">Versions</h2>
+              <p>Work in progress...</p>
+            </div>
           </div>
         </main>
       </div>

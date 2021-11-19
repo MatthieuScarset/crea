@@ -46,6 +46,8 @@ class App extends Component {
 
   /**
    * Load existing pricings.
+   *
+   * @todo Refresh pricings list on PricingForm tx success.
    */
   getPricings = async () => {
     let contract = this.state.contract;

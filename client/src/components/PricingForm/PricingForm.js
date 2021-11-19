@@ -27,16 +27,13 @@ class PricingForm extends React.Component {
         this.state.amount
     );
 
-    // @todo Send transaction
-    // const { logs } = await this.contract.methods.addPricing("Logo", 1);
+    // Send transaction
     const result = await this.contract.methods
       .addPricing(this.state.name, this.state.amount)
       .send({
         from: this.account,
         value: this.web3.utils.toWei("1", "ether"),
       });
-
-    console.log(result);
   }
 
   render() {

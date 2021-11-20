@@ -12,7 +12,6 @@ const Pricings = (props) => (
     </li>
     {props.items.length > 0 ? (
       props.items.map(function (item, i) {
-        console.log(item);
         return (
           <li
             key={i}

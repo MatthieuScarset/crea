@@ -7,6 +7,9 @@ contract ImmutableDocument is Ownable {
     // Hash on IPFS network.
     string[] private versions;
 
+    // List of versions timestamp, keyed by unique CID.
+    mapping(string => uint256) private list;
+
     // Price to pay to upload document.
     uint256 private fee = 0;
 
@@ -25,6 +28,11 @@ contract ImmutableDocument is Ownable {
         return fee;
     }
 
+    // Get number of versions.
+    function getDocumentLength() public view returns (uint256) {
+        return versions.length;
+    }
+
     // Get latest version of the online document.
     function getDocument() public view returns (string memory) {
         if (versions.length == 0) {
@@ -39,10 +47,21 @@ contract ImmutableDocument is Ownable {
         return versions[i];
     }
 
+    // Get timestamp of a given version.
+    function getDocumentTimestamp(string memory cid)
+        public
+        view
+        returns (uint256)
+    {
+        return list[cid];
+    }
+
     /// @dev Saves a given path provided by Infura
     function setDocument(string memory cid) public payable {
         require(msg.value >= fee);
+        require(list[cid] == 0, "Document already exists.");
 
+        list[cid] = block.timestamp;
         versions.push(cid);
 
         emit NewVersion(versions.length - 1);

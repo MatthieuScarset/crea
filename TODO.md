@@ -1,0 +1,2 @@
+- Inform user of transactions' state (e.g. popins)
+- Refresh state/UX when transactions finished

@@ -1,5 +1,5 @@
-const UniversalPricing = artifacts.require("UniversalPricing");
+const PricingSheet = artifacts.require("PricingSheet");
 
 module.exports = function (deployer) {
-  deployer.deploy(UniversalPricing);
+  deployer.deploy(PricingSheet);
 };

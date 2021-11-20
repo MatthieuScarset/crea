@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/MatthieuScarset/crea.eth#readme",
   "devDependencies": {
-    "@openzeppelin/contracts": "^4.3.3"
+    "@openzeppelin/contracts": "^4.3.3",
+    "@openzeppelin/test-helpers": "^0.5.15"
   }
 }

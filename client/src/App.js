@@ -2,7 +2,7 @@ import { create } from "ipfs-http-client";
 import React, { Component } from "react";
 import PricingForm from "./components/PricingForm/PricingForm";
 import Pricings from "./components/Pricings/Pricings";
-import UniversalPricing from "./contracts/UniversalPricing.json";
+import PricingSheet from "./contracts/PricingSheet.json";
 import getWeb3 from "./getWeb3";
 
 class App extends Component {
@@ -10,9 +10,9 @@ class App extends Component {
     web3: null,
     accounts: null,
     contract: null,
-    ipfs: null,
     pricings: [],
-    docHash: null,
+    ipfs: null,
+    docHash: "",
   };
 
   componentDidMount = async () => {
@@ -25,44 +25,55 @@ class App extends Component {
 
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
-      const deployedNetwork = UniversalPricing.networks[networkId];
+      const deployedNetwork = PricingSheet.networks[networkId];
       const instance = new web3.eth.Contract(
-        UniversalPricing.abi,
+        PricingSheet.abi,
         deployedNetwork && deployedNetwork.address
       );
 
-      // Get web3 storage client.
-      const ipfs = await create("https://ipfs.infura.io:5001/api/v0");
-
       // Set web3, accounts, contract and Pricings to the state.
-      this.setState(
-        {
-          web3,
-          accounts,
-          contract: instance,
-          ipfs: ipfs,
-          pricings: [],
-          docHash: "",
-        },
-        this.getContractValues
-      );
-
-      this.publishToIpfs = this.publishToIpfs.bind(this);
+      this.setState({
+        web3,
+        accounts,
+        contract: instance,
+      });
     } catch (error) {
-      // Catch any errors for any of the above operations.
       alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`
+        "Failed to load web3, accounts, or contract. Check console for details."
       );
       console.error(error);
     }
-  };
 
-  /**
-   * Set state callback function.
-   */
-  getContractValues = async () => {
-    this.getPricings();
-    this.getDocHash();
+    try {
+      const pricings = await this.getPricings();
+      this.setState({ pricings: pricings });
+    } catch (error) {
+      alert(
+        "Failed to pricing, accounts, or contract. Check console for details."
+      );
+      console.error(error);
+    }
+
+    try {
+      // Get web3 storage client.
+      const ipfsHttpClient = await create("https://ipfs.infura.io:5001/api/v0");
+      this.setState({ ipfs: ipfsHttpClient });
+
+      // Form binding.
+      this.publishToIpfs = this.publishToIpfs.bind(this);
+    } catch (error) {
+      alert("Failed to load IPFS client. Check console for details.");
+      console.error(error);
+    }
+
+    try {
+      const docHash = await this.getDocument();
+      this.setState({ docHash: docHash });
+    } catch (error) {
+      console.error(
+        "Could not load document. Maybe none exists onchain yet..."
+      );
+    }
   };
 
   /**
@@ -84,22 +95,20 @@ class App extends Component {
       list.push(price);
     }
 
-    // Update state with the result.
-    this.setState({ pricings: list });
+    return list;
   };
 
   /**
-   * Load document hash.
+   * Get latest document hash.
    *
    * @todo Refresh hash when user publish to IPFS again.
    */
-  getDocHash = async () => {
-    let contract = this.state.contract;
-    let _hash = await contract.methods.getDocument().call({
+  getDocument = async () => {
+    let _hash = await this.state.contract.methods.getDocument().call({
       from: this.state.accounts[0],
     });
 
-    this.setState({ docHash: _hash });
+    return _hash;
   };
 
   /**
@@ -125,17 +134,12 @@ class App extends Component {
       from: this.state.accounts[0],
       value: this.state.web3.utils.toWei("1", "ether"),
     });
-
-    // @todo remove this refresh and listen to tx.
-    window.location.reload();
   };
 
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
-
-    console.log(this.state.docHash.length);
 
     return (
       <div className="w-full md:w-1/3 m-auto flex flex-col space-y-10 md:space-y-8">
@@ -153,7 +157,7 @@ class App extends Component {
             <h2 className="text-xl font-extrabold">Universal pricings</h2>
 
             <div className="flex flex-col space-y-0.5">
-              {this.state.docHash.length == 0 ? (
+              {this.state.docHash.length === 0 ? (
                 ""
               ) : (
                 <a

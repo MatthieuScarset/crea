@@ -1,6 +1,5 @@
 import { create } from "ipfs-http-client";
 import React, { Component } from "react";
-import PricingForm from "./components/PricingForm/PricingForm";
 import Pricings from "./components/Pricings/Pricings";
 import PricingSheet from "./contracts/PricingSheet.json";
 import getWeb3 from "./getWeb3";
@@ -13,7 +12,9 @@ class App extends Component {
     pricings: [],
     ipfs: null,
     versions: [],
-    fee: 0,
+    feeAmount: "0",
+    priceName: null,
+    priceAmount: null,
   };
 
   componentDidMount = async () => {
@@ -61,9 +62,6 @@ class App extends Component {
     try {
       const ipfsHttpClient = await create("https://ipfs.infura.io:5001/api/v0");
       this.setState({ ipfs: ipfsHttpClient });
-
-      // Form binding.
-      this.publishToIpfs = this.publishToIpfs.bind(this);
     } catch (error) {
       alert("Failed to load IPFS client. Check console for details.");
       console.error(error);
@@ -88,11 +86,16 @@ class App extends Component {
 
     // Fee for future transactions.
     try {
-      let amount = await this.getFeeAmount();
-      this.setState({ fee: amount });
+      let _amount = await this.getFeeAmount();
+      this.setState({ feeAmount: _amount });
     } catch (error) {
       console.log(error);
     }
+
+    // Form binding.
+    this.publishToIpfs = this.publishToIpfs.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   };
 
   /**
@@ -167,16 +170,43 @@ class App extends Component {
     const cid = added.path;
     await this.state.contract.methods.setDocument(cid).send({
       from: this.state.accounts[0],
-      value: this.state.fee, // this.state.web3.utils.toWei("1", "ether"),
+      value: this.state.feeAmount, // this.state.web3.utils.toWei("1", "ether"),
     });
   };
 
+  // Pricing form handler.
+  handleChange = async (event) => {
+    let key = event.target.name;
+    let value = event.target.value;
+    this.setState({ [key]: value });
+  };
+
+  // Pricing form submit.
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    console.log(
+      "A new pricing was submitted with: " +
+        this.state.priceName +
+        " " +
+        this.state.priceAmount
+    );
+
+    // Send transaction
+    const result = await this.state.contract.methods
+      .addPricing(this.state.priceName, this.state.priceAmount)
+      .send({
+        from: this.state.accounts[0],
+        value: this.state.feeAmount, // this.state.web3.utils.toWei("1", "ether"),
+      });
+
+    console.log(result);
+  };
+
+  // Render app.
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
-
-    console.log(this.state.fee);
 
     return (
       <div className="w-full px-4 md:w-1/2 lg:w-1/3 m-auto flex flex-col space-y-10 md:space-y-8">
@@ -205,11 +235,37 @@ class App extends Component {
 
           <div className="bg-gray-100 rounded-xl p-8">
             <h2 className="text-xl font-extrabold">Add a new pricing</h2>
-            <PricingForm
-              web3={this.state.web3}
-              contract={this.state.contract}
-              account={this.state.accounts[0]}
-            />
+            <form
+              className="flex flex-col space-y-2"
+              data-testid="PricingForm"
+              onSubmit={this.handleSubmit}
+            >
+              <label className="flex flex-col">
+                Name
+                <input
+                  name="priceName"
+                  type="text"
+                  placeholder="Flyer design"
+                  onChange={this.handleChange}
+                  required
+                />
+              </label>
+              <label className="flex flex-col">
+                Price
+                <input
+                  name="priceAmount"
+                  type="number"
+                  placeholder="1 ETH"
+                  onChange={this.handleChange}
+                  required
+                />
+              </label>
+              <input
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
+                value="Add"
+              />
+            </form>
           </div>
 
           <div className="bg-gray-100 rounded-xl p-8">

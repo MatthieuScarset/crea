@@ -25,9 +25,11 @@ contract PricingSheet is ImmutableDocument {
     }
 
     /// @dev Fee is set by the owner - inherited from ImmutableDocument.
-    function addPricing(string memory _label, uint256 _price) public payable {
-        require(msg.value >= this.getFee());
-
+    function addPricing(string memory _label, uint256 _price)
+        public
+        payable
+        sufficientPay
+    {
         require(bytes(_label).length > 0, "Label cannot be empty.");
         require(_price >= 0, "Price must be greater than zero.");
 
@@ -40,9 +42,7 @@ contract PricingSheet is ImmutableDocument {
         uint256 i,
         string memory _label,
         uint256 _price
-    ) public payable {
-        require(msg.value >= this.getFee());
-
+    ) public payable sufficientPay {
         require(bytes(_label).length > 0, "Label cannot be empty.");
         require(_price >= 0, "Price must be greater than zero.");
         require(pricings[i].available, "Pricing is not available anymore.");
@@ -53,9 +53,7 @@ contract PricingSheet is ImmutableDocument {
         emit PricingUpdated(i);
     }
 
-    function disablePricing(uint256 i) public payable {
-        require(msg.value >= this.getFee());
-
+    function disablePricing(uint256 i) public payable sufficientPay {
         pricings[i].available = false;
 
         emit PricingDisabled(i);

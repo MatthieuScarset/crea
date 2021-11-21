@@ -10,12 +10,17 @@ contract ImmutableDocument is Ownable {
     // List of versions timestamp, keyed by unique CID.
     mapping(string => uint256) private list;
 
-    // Price to pay to upload document.
+    // Required amount for "sufficientPay" modifier, in Wei.
     uint256 private fee = 0;
 
     // Events.
     event NewVersion(uint256 indexed index);
     event NewFee(uint256 indexed amount);
+
+    modifier sufficientPay() {
+        require(msg.value >= this.getFee());
+        _;
+    }
 
     // Owner-restricted methods.
     function setFee(uint256 amount) public onlyOwner {
@@ -24,7 +29,7 @@ contract ImmutableDocument is Ownable {
     }
 
     // Use this in your dapp before sending ETH.
-    function getFee() public view returns (uint256 feeAmount) {
+    function getFee() public view returns (uint256) {
         return fee;
     }
 
@@ -57,8 +62,7 @@ contract ImmutableDocument is Ownable {
     }
 
     /// @dev Saves a given path provided by Infura
-    function setDocument(string memory cid) public payable {
-        require(msg.value >= fee);
+    function setDocument(string memory cid) public payable sufficientPay {
         require(list[cid] == 0, "Document already exists.");
 
         list[cid] = block.timestamp;

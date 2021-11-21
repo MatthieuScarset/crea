@@ -32,7 +32,7 @@ class PricingForm extends React.Component {
       .addPricing(this.state.name, this.state.amount)
       .send({
         from: this.account,
-        value: this.web3.utils.toWei("1", "ether"),
+        value: this.state.fee, // this.state.web3.utils.toWei("1", "ether"),
       });
   }
 

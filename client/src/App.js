@@ -13,9 +13,11 @@ class App extends Component {
     pricings: [],
     ipfs: null,
     versions: [],
+    fee: 0,
   };
 
   componentDidMount = async () => {
+    // Global web3 settings.
     try {
       // Get network provider and web3 instance.
       const web3 = await getWeb3();
@@ -83,6 +85,21 @@ class App extends Component {
       console.error(error);
       // "Could not load document. Maybe none exists onchain yet..."
     }
+
+    // Fee for future transactions.
+    try {
+      let amount = await this.getFeeAmount();
+      this.setState({ fee: amount });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  /**
+   * Get fee defined in smart contract.
+   */
+  getFeeAmount = async () => {
+    return await this.state.contract.methods.getFee().call();
   };
 
   /**
@@ -150,7 +167,7 @@ class App extends Component {
     const cid = added.path;
     await this.state.contract.methods.setDocument(cid).send({
       from: this.state.accounts[0],
-      value: this.state.web3.utils.toWei("1", "ether"),
+      value: this.state.fee, // this.state.web3.utils.toWei("1", "ether"),
     });
   };
 
@@ -158,6 +175,8 @@ class App extends Component {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
+
+    console.log(this.state.fee);
 
     return (
       <div className="w-full px-4 md:w-1/2 lg:w-1/3 m-auto flex flex-col space-y-10 md:space-y-8">

@@ -13084,10 +13084,101 @@
       "links": {},
       "address": "0x11e8d1C8A935Ef12dD74bF2E2Aa5Dd47fBE37b86",
       "transactionHash": "0xb46932ffb5ddc6aebeaf40cf00daf19777991573045dac949fc48dda28d73457"
+    },
+    "1637492072814": {
+      "events": {
+        "0x63fe946ed58429ac3c5e64d4356ff92c26d7fa1e73586515df8ba9f059ab54a5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "NewFee",
+          "type": "event"
+        },
+        "0xec07903169417f8f86cea39660b8fb4409d9de5d053c2e7a8feaffba6232ca72": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "NewPricing",
+          "type": "event"
+        },
+        "0x2377dbac273100553910be417049f43b6cc9b6605e656d62733628454b30c8ce": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "NewVersion",
+          "type": "event"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        "0x89a624f5b15a7a95fa6b1c528a22dc8d76e70cbf7a81377ddb89256ab081a59e": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "PricingDisabled",
+          "type": "event"
+        },
+        "0xb008cd76c510abcc3816b2078377051cc946bfc2c06c3fd13b3804c019207b89": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "PricingUpdated",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x49b57CA8929a3c8d1D8E5DDfD261dD93a4aA84cD",
+      "transactionHash": "0x0b25c4b7ab114653c73c22df7903ecc30a5e524a48c68f7d85637a9aa22df74e"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-11-21T09:55:51.550Z",
+  "updatedAt": "2021-11-21T11:21:24.945Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

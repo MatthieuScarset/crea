@@ -12,9 +12,9 @@ class App extends Component {
     pricings: [],
     ipfs: null,
     versions: [],
-    feeAmount: "0",
     priceName: null,
     priceAmount: null,
+    feeAmount: null,
   };
 
   componentDidMount = async () => {
@@ -84,13 +84,7 @@ class App extends Component {
       // "Could not load document. Maybe none exists onchain yet..."
     }
 
-    // Fee for future transactions.
-    try {
-      let _amount = await this.getFeeAmount();
-      this.setState({ feeAmount: _amount });
-    } catch (error) {
-      console.log(error);
-    }
+    this.setState({ feeAmount: await this.getFeeAmount() });
 
     // Form binding.
     this.publishToIpfs = this.publishToIpfs.bind(this);
@@ -168,9 +162,12 @@ class App extends Component {
 
     const added = await this.state.ipfs.add(file);
     const cid = added.path;
+    const _amount = await this.getFeeAmount();
+    console.log(_amount);
+
     await this.state.contract.methods.setDocument(cid).send({
       from: this.state.accounts[0],
-      value: this.state.feeAmount, // this.state.web3.utils.toWei("1", "ether"),
+      value: this.state.web3.utils.toWei(_amount, "ether"),
     });
   };
 
@@ -192,11 +189,12 @@ class App extends Component {
     );
 
     // Send transaction
+    let _amount = await this.getFeeAmount();
     const result = await this.state.contract.methods
       .addPricing(this.state.priceName, this.state.priceAmount)
       .send({
         from: this.state.accounts[0],
-        value: this.state.feeAmount, // this.state.web3.utils.toWei("1", "ether"),
+        value: this.state.web3.utils.toWei(_amount, "ether"),
       });
 
     console.log(result);
@@ -217,6 +215,10 @@ class App extends Component {
             alt="Logo of the CREA project"
           />
           <h1 className="invisible">CREA</h1>
+          <div className="text-center italic">
+            Cost: {this.state.feeAmount}
+            &nbsp;ETH
+          </div>
         </header>
 
         <main className="flex flex-col space-y-10 md:space-y-8">
